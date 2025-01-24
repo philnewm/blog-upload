@@ -1,0 +1,69 @@
+---
+
+name: Upload markdown files
+description: Convert certain elements of the provided file to fit the requirements for certain blog page providers
+
+branding:
+  icon: arrow-left-circle
+  color: green
+
+inputs:
+  markdown_file_path:
+    description: "The path to the markdown file to convert"
+    required: true
+  devto:
+    description: "Switch to enable dev.to upload"
+    required: false
+    default: "false"
+  devto_key:
+    description: "Required key to upload to dev.to"
+    required: false
+  medium:
+    description: "Switch to enable medium.com upload"
+    required: false
+    default: "false"
+  medium_key:
+    description: "The replaced admonitions files output file path"
+    required: false
+    default: "false"
+
+runs:
+  using: composite
+
+  steps:
+    - name: Setup Python
+      id: setup-python
+      uses: actions/setup-python@v5
+      with:
+        python-version: 3.X
+
+    - name: Install dependencies
+      shell: bash
+      run: |
+        cd $GITHUB_ACTION_PATH
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Get code files
+      if: inputs.code
+      shell: bash
+      run: |
+        cd $GITHUB_ACTION_PATH
+        python markdown_conversion.py download-files ${{ inputs.domain_url }} ${{ inputs.markdown_file_path }} 
+
+    - name: Replace code references
+      if: inputs.code
+      shell: bash
+      run: |
+        cd $GITHUB_ACTION_PATH
+        python markdown_conversion.py insert-code-references ${{ inputs.markdown_file_path }} ${{ inputs.output_file_code }}
+
+    # TODO Ensure logic can run independent from each other
+    # currently update admonitions is dependent on code-replacement
+    - name: Update admonitions
+      shell: bash
+      run: |
+        cd $GITHUB_ACTION_PATH
+        python markdown_conversion.py replace-admonitions ${{ inputs.output_file_code }} ${{ inputs.output_file_admonitions }}
+
+...
