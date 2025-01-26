@@ -1,7 +1,7 @@
 ---
 
 name: Upload markdown files
-description: Convert certain elements of the provided file to fit the requirements for certain blog page providers
+description: Build blog post and uplaod to services like dev.to, medium, etc.
 
 branding:
   icon: arrow-left-circle
@@ -11,20 +11,23 @@ inputs:
   markdown_file_path:
     description: "The path to the markdown file to convert"
     required: true
-  devto:
-    description: "Switch to enable dev.to upload"
+  service:
+    description: "The service to upload the markdown file to"
+    required: true
+  key:
+    description: "Required key to upload to service"
+    required: true
+  canonical_url:
+    description: "Canonical URL of the blog post"
     required: false
-    default: "false"
-  devto_key:
-    description: "Required key to upload to dev.to"
+    default: ""
+  description:
+    description: "Description of the blog post"
     required: false
-  medium:
-    description: "Switch to enable medium.com upload"
-    required: false
-    default: "false"
-  medium_key:
-    description: "The replaced admonitions files output file path"
-    required: false
+    default: ""
+  publish:
+    description: "Publish blog right away"
+    required: true
     default: "false"
 
 runs:
@@ -45,25 +48,10 @@ runs:
         pip install -r requirements.txt
 
     - name: Get code files
-      if: inputs.code
+      if: inputs.service == "devto"
       shell: bash
       run: |
         cd $GITHUB_ACTION_PATH
-        python markdown_conversion.py download-files ${{ inputs.domain_url }} ${{ inputs.markdown_file_path }} 
-
-    - name: Replace code references
-      if: inputs.code
-      shell: bash
-      run: |
-        cd $GITHUB_ACTION_PATH
-        python markdown_conversion.py insert-code-references ${{ inputs.markdown_file_path }} ${{ inputs.output_file_code }}
-
-    # TODO Ensure logic can run independent from each other
-    # currently update admonitions is dependent on code-replacement
-    - name: Update admonitions
-      shell: bash
-      run: |
-        cd $GITHUB_ACTION_PATH
-        python markdown_conversion.py replace-admonitions ${{ inputs.output_file_code }} ${{ inputs.output_file_admonitions }}
+        python main.py create-devto-blog ${{ markdown_file_path }} ${{ inputs.key }} ${{ inputs.canonical_url }} ${{ inputs.description }} ${{ inputs.publish }}
 
 ...

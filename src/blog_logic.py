@@ -1,8 +1,10 @@
 import json
+import logging
 import requests
 from typing import Optional
 import yaml
 
+logger: logging.Logger = logging.getLogger(__name__)
 
 class BlogArticle():
     def __init__(self, md_content: str) -> None:
@@ -35,7 +37,7 @@ class BlogArticle():
         self.text = self.text.lstrip("\n")
         if self.text.startswith("## "):
             return self.text.lstrip("\n")
-        
+
     def upload_devto(self, api_key: str, canonical_url: str, description: str, published: bool= False) -> None:
 
         headers_dev: dict[str, str] = {
@@ -67,11 +69,10 @@ class BlogArticle():
 
 
 def eval_response(response: requests.Response) -> None:
-    # TODO change to logging
     if response.status_code == 201:
-        print("Article published successfully!")
-        print("Response:", response.json())
+        logger.info("Article published successfully!")
+        logger.debug("Response:", response.json())
         return
 
-    print(f"Failed to publish article. Status code: {response.status_code}")
-    print("Response:", response.json())
+    logger.error(f"Failed to publish article. Status code: {response.status_code}")
+    logger.error("Response:", response.json())
