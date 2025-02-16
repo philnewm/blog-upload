@@ -19,7 +19,8 @@ def cli() -> None:
 def sync_blog(articles_map: str, local_path: str, source_url: str, api_key: str, published: bool) -> None:
 
     articles_id_map: dict[str, str] = json.loads(articles_map)
-    for file_path, id in articles_id_map:
+
+    for file_path, id in articles_id_map.items():
         logger.info(f"Checking article {file_path}")
 
         if file_path and id:
@@ -43,3 +44,6 @@ def sync_blog(articles_map: str, local_path: str, source_url: str, api_key: str,
 
             blog_logic.unpublish_existing_blog(api_key=api_key, id=id)
             continue
+
+if __name__ == "__main__":
+    cli()
