@@ -8,7 +8,7 @@ import click
 def cli() -> None:
     pass
 
-@cli.command("create-devto-blog")
+@cli.command("sync-blog")
 @click.argument("articles_map", type=click.STRING, required=True)
 @click.argument("local_path", type=click.STRING, required=True)
 @click.argument("source_url", type=click.STRING, required=True)
