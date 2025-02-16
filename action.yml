@@ -8,6 +8,9 @@ branding:
   color: green
 
 inputs:
+  articles_map:
+    description: "Json datastructure mapping filepaths to artcile ids"
+    required: true
   markdown_files_dir:
     description: "The path to the markdown file to convert"
     required: true
@@ -47,6 +50,6 @@ runs:
       shell: bash
       run: |
         cd $GITHUB_ACTION_PATH
-        python main.py create-devto-blog ${{ inputs.markdown_files_dir }} ${{ inputs.key }} ${{ inputs.publish }}
+        python main.py create-devto-blog ${{ inputs.articles_map }} ${{ inputs.markdown_files_dir }} ${{ inputs.gh_pages_repo }} ${{ inputs.key }} ${{ inputs.publish }}
 
 ...
