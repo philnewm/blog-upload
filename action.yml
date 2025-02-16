@@ -46,7 +46,7 @@ runs:
         pip install -r requirements.txt
 
     - name: Get code files
-      if: inputs.service == "Dev.to"
+      if: inputs.service == "Devto"
       shell: bash
       run: |
         cd $GITHUB_ACTION_PATH
