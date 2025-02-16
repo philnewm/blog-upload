@@ -8,23 +8,18 @@ branding:
   color: green
 
 inputs:
-  markdown_file_path:
+  markdown_files_dir:
     description: "The path to the markdown file to convert"
     required: true
   service:
     description: "The service to upload the markdown file to"
     required: true
+  gh_pages_repo:
+    description: GitHub Pages source url
+    required: True
   key:
     description: "Required key to upload to service"
     required: true
-  canonical_url:
-    description: "Canonical URL of the blog post"
-    required: false
-    default: ""
-  description:
-    description: "Description of the blog post"
-    required: false
-    default: ""
   publish:
     description: "Publish blog right away"
     required: true
@@ -48,10 +43,10 @@ runs:
         pip install -r requirements.txt
 
     - name: Get code files
-      if: inputs.service == "devto"
+      if: inputs.service == "Dev.to"
       shell: bash
       run: |
         cd $GITHUB_ACTION_PATH
-        python main.py create-devto-blog ${{ markdown_file_path }} ${{ inputs.key }} ${{ inputs.canonical_url }} ${{ inputs.description }} ${{ inputs.publish }}
+        python main.py create-devto-blog ${{ inputs.markdown_files_dir }} ${{ inputs.key }} ${{ inputs.publish }}
 
 ...
