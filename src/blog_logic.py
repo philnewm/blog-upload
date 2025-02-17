@@ -68,6 +68,7 @@ class BlogArticle():
             data=json.dumps(article_payload)
         )
 
+        logger.error(f"payload: {article_payload}")
         eval_response(response)
 
     def update_existing_blog(self, api_key: str, id: str, published: bool) -> None:
@@ -96,6 +97,7 @@ class BlogArticle():
             data=json.dumps(article_payload),
         )
 
+        logger.error(f"payload: {article_payload}")
         eval_response(response)
 
 def eval_response(response: requests.Response) -> None:
@@ -105,8 +107,7 @@ def eval_response(response: requests.Response) -> None:
         return
 
     logger.error(f"Failed to publish article. Status code: {response.status_code}")
-    logger.error("Response:", response.json())
-
+    logger.error(f"Response: {response.content}")
 
 def unpublish_existing_blog(api_key: str, id: str) -> None:
         headers_dev: dict[str, str] = {
