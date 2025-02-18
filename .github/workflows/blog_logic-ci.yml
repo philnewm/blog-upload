@@ -42,4 +42,23 @@
               pytest
             working-directory: ${{ github.workspace }}
 
+
+
+      integreatin-tests:
+        runs-on: ubuntu-latest
+
+        steps:
+          - name: Get markdown files
+            run: |
+              curl
+
+          - name: Apply changes to articles
+            uses: philnewm/blog-upload@main
+            with:
+              articles_map: ${{ needs.collect-articles.outputs.files_map }}
+              markdown_files_dir: "${{ github.workspace }}/tmp/"
+              service: "Devto"
+              gh_pages_repo: "https://philnewm.github.io/"
+              key: ${{ secrets.DEVTO_KEY }}
+              publish: False
 ...
