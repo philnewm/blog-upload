@@ -44,13 +44,16 @@
 
 
 
-      integreatin-tests:
+      integration-tests:
+        needs:
+          - unit-tests
         runs-on: ubuntu-latest
 
         steps:
           - name: Get markdown files
             run: |
-              curl -Z --output-dir "${{ github.workspace }}/tmp/ -O "https://raw.githubusercontent.com/philnewm/blog-upload/refs/heads/main/tests/integrationtests/ansible_molecule_using_vagrant_and_virtualbox.md -O https://raw.githubusercontent.com/philnewm/blog-upload/refs/heads/main/tests/integrationtests/ci_in_github_actions.md
+              mkdir -p ${{ github.workspace }}/tmp/
+              curl -Z --output-dir "${{ github.workspace }}/tmp/"" -O "https://raw.githubusercontent.com/philnewm/blog-upload/refs/heads/main/tests/integrationtests/ansible_molecule_using_vagrant_and_virtualbox.md -O https://raw.githubusercontent.com/philnewm/blog-upload/refs/heads/main/tests/integrationtests/ci_in_github_actions.md
 
           - name: Apply changes to articles
             uses: philnewm/blog-upload@main
