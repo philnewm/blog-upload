@@ -58,7 +58,7 @@
           - name: Apply changes to articles
             uses: philnewm/blog-upload@main
             with:
-              articles_map: ${{ env.article_id_map }}
+              articles_map: '${{ env.article_id_map }}'
               markdown_files_dir: "${{ github.workspace }}/tmp/"
               service: "Devto"
               gh_pages_repo: "https://philnewm.github.io/"
