@@ -50,15 +50,17 @@
         steps:
           - name: Get markdown files
             run: |
-              curl
+              curl -Z --output-dir "${{ github.workspace }}/tmp/ -O "https://raw.githubusercontent.com/philnewm/blog-upload/refs/heads/main/tests/integrationtests/ansible_molecule_using_vagrant_and_virtualbox.md -O https://raw.githubusercontent.com/philnewm/blog-upload/refs/heads/main/tests/integrationtests/ci_in_github_actions.md
 
           - name: Apply changes to articles
             uses: philnewm/blog-upload@main
             with:
-              articles_map: ${{ needs.collect-articles.outputs.files_map }}
+              articles_map: ${{ env.article_id_map }}
               markdown_files_dir: "${{ github.workspace }}/tmp/"
               service: "Devto"
               gh_pages_repo: "https://philnewm.github.io/"
               key: ${{ secrets.DEVTO_KEY }}
               publish: False
+            env:
+              article_id_map: '{"ansible/molecule_getting_started/ansible_molecule_using_vagrant_and_virtualbox.md": "", "ansible/some_actions/ci_in_github_actions.md": "", "": 2180598}'
 ...
