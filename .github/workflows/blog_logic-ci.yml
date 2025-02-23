@@ -65,5 +65,5 @@
               key: ${{ secrets.DEVTO_KEY }}
               publish: False
             env:
-              article_id_map: '{"ansible/molecule_getting_started/ansible_molecule_using_vagrant_and_virtualbox.md": "", "ansible/some_actions/ci_in_github_actions.md": "", "": 2180598}'
+              article_id_map: '{"ansible/molecule_getting_started/ansible_molecule_using_vagrant_and_virtualbox.md": "2179805", "ansible/some_actions/ci_in_github_actions.md": "", "": 2180598}'
 ...
