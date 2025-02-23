@@ -2,6 +2,7 @@ from enum import Enum
 import json
 import logging
 import requests
+import sys
 from typing import Optional
 import yaml
 
@@ -114,6 +115,7 @@ def eval_response(response: requests.Response, type: ReponseCodes) -> None:
 
     logger.error(f"Failed to publish article. Status code: {response.status_code}")
     logger.error(f"Response: {response.content}")
+    sys.exit(1)
 
 
 def unpublish_existing_blog(api_key: str, id: str) -> None:
