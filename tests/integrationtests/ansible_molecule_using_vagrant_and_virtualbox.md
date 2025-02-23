@@ -6,7 +6,7 @@ tags:
   - blog
 description: Set up basic CI for Ansible using Molecule
 ---
-# Getting started with Ansible Molecule
+# Getting started with Molecule
 
 ## Intro
 

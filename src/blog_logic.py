@@ -107,13 +107,12 @@ class BlogArticle():
 
 
 def eval_response(response: requests.Response, type: ReponseCodes) -> None:
-    logger.error(f"Checking output for {type}")
     if response.status_code == type.value:
-        logger.info("Article published successfully!")
+        logger.info(f"Article {type.name}!")
         logger.debug("Response:", response.json())
         return
 
-    logger.error(f"Failed to publish article. Status code: {response.status_code}")
+    logger.error(f"Failed to {type.name} article. Status code: {response.status_code}")
     logger.error(f"Response: {response.content}")
     sys.exit(1)
 
