@@ -109,7 +109,6 @@ class BlogArticle():
 def eval_response(response: requests.Response, type: ReponseCodes) -> None:
     if response.status_code == type.value:
         logger.info(f"Article {type.name}!")
-        logger.debug("Response:", response.json())
         return
 
     logger.error(f"Failed to {type.name} article. Status code: {response.status_code}")
@@ -117,16 +116,53 @@ def eval_response(response: requests.Response, type: ReponseCodes) -> None:
     sys.exit(1)
 
 
+def get_published_title(article_id: int) -> str:
+    api_url: str = f"https://dev.to/api/articles/{article_id}"
+    response: requests.Response = requests.get(api_url)
+
+    if response.status_code == 200:
+        article = response.json()
+        return article["title"]
+
+    logger.error(f"Error: {response.status_code}, {response.text}")
+    return ""
+
+
+def get_unpublished_title(api_key: str, article_id: int) -> str:
+    api_url = "https://dev.to/api/articles/me/unpublished"
+    headers: dict[str, str] = {"api-key": api_key}
+    response: requests.Response = requests.get(api_url, headers=headers)
+    if response.status_code == 200:
+        articles = response.json()
+        article = next((article for article in articles if article["id"] == article_id), None)
+
+        if article:
+            return article["title"]
+
+        logger.error("Article not found.")
+        return ""
+
+    logger.error(f"Error: {response.status_code}, {response.text}")
+    return ""
+
+
 def unpublish_existing_blog(api_key: str, id: str) -> None:
+        
+        current_title: str = get_unpublished_title(api_key, int(id))
+
+        if not current_title:
+            logger.error("Article not found.")
+            sys.exit(1)
+
         headers_dev: dict[str, str] = {
             "Content-Type": "application/json",
             "api-key": api_key,
         }
 
-        article_payload: dict[str, dict[str, bool]] = {
+        article_payload = {
             "article": {
                 "published": False,
-                "title": "[Deleted]",
+                "title": f"[Deleted] - {current_title}",
             }
         }
 
