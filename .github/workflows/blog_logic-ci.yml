@@ -1,7 +1,7 @@
 ---
 
     name: CI
-    
+
     on:
       push:
         branches:
@@ -11,12 +11,13 @@
           - 'TODO.md'
           - '**/*.md'
           - .gitignore
-    
+
     env:
       PYTHON_VERSION: "3.12"
+      DEVTO_API_KEY: ${{ secrets.DEVTO_KEY }}
     
     jobs:
-      unit-tests:
+      pytest:
         runs-on: ubuntu-latest
     
         steps:
@@ -39,14 +40,18 @@
 
           - name: Run unit tests
             run: |
-              pytest
+              pytest tests/unittests/
             working-directory: ${{ github.workspace }}
 
+          - name: Run integration tests
+            run: |
+              pytest tests/integrationtests/
+            working-directory: ${{ github.workspace }}
 
-
-      integration-tests:
+      smoke-tests:
+        if: false
         needs:
-          - unit-tests
+          - pytest
         runs-on: ubuntu-latest
 
         steps:
@@ -66,4 +71,5 @@
               publish: False
             env:
               article_id_map: '{"ansible/molecule_getting_started/ansible_molecule_using_vagrant_and_virtualbox.md": "2179805", "ansible/some_actions/ci_in_github_actions.md": "", "": 2180598}'
+
 ...

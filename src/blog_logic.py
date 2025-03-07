@@ -5,6 +5,7 @@ import requests
 import sys
 from typing import Optional
 import yaml
+import time
 
 logger: logging.Logger = logging.getLogger(__name__)
 
@@ -12,8 +13,14 @@ class ReponseCodes(Enum):
     update_successful = 200
     created_successful = 201
 
+class TimeOuts(Enum):
+    create = 0.4
+    rate_limit = 30
+    update = 0.4
+
+
 class BlogArticle():
-    def __init__(self, md_content: str, source_url: str) -> None:
+    def __init__(self, md_content: str, source_url: str="") -> None:
         self.text: str = md_content
         self.tags: list[str] | None
         self.title: str | None
@@ -47,7 +54,7 @@ class BlogArticle():
         
         return ""
 
-    def create_new_blog(self, api_key: str, published: bool= False) -> None:
+    def create_new_blog(self, api_key: str, published: bool = False, retries: int = 3) -> requests.Response:
 
         headers_dev: dict[str, str] = {
             "Content-Type": "application/json",
@@ -61,22 +68,31 @@ class BlogArticle():
                 "published": published,
                 "series": None,
                 "main_image": None,
-                "canonical_url": self.canonical_url,
-                "description": self.description,
+                "canonical_url": self.canonical_url or None,
+                "description": self.description or None,
                 "tags": self.tags,
                 "organization_id": None,
             }
         }
 
-        response: requests.Response = requests.post(
-            url='https://dev.to/api/articles',
-            headers=headers_dev,
-            data=json.dumps(article_payload)
-        )
+        for _ in range(retries - 1):
+            time.sleep(TimeOuts.create.value)
+            response: requests.Response = requests.post(
+                url='https://dev.to/api/articles',
+                headers=headers_dev,
+                data=json.dumps(article_payload)
+            )
 
-        eval_response(response, ReponseCodes.created_successful)
+            if response.status_code == ReponseCodes.created_successful.value:
+                return response
 
-    def update_existing_blog(self, api_key: str, id: str, published: bool) -> None:
+            logger.warning(f"Got error {response.content}. Retrying in {TimeOuts.rate_limit.value} seconds...")
+            time.sleep(TimeOuts.rate_limit.value)
+
+        logger.error(f"Failed creating article '{self.title}' after {retries} retries. Status code: {response.status_code}")
+        sys.exit(1)
+
+    def update_existing_blog(self, api_key: str, id: str, published: bool, retries: int = 3) -> requests.Response:
         headers_dev: dict[str, str] = {
             "Content-Type": "application/json",
             "api-key": api_key,
@@ -96,14 +112,22 @@ class BlogArticle():
             }
         }
 
-        response: requests.Response = requests.put(
-            url=f"https://dev.to/api/articles/{id}",
-            headers=headers_dev,
-            data=json.dumps(article_payload),
-        )
+        for _ in range(retries - 1):
+            time.sleep(TimeOuts.update.value)
+            response: requests.Response = requests.put(
+                url=f"https://dev.to/api/articles/{id}",
+                headers=headers_dev,
+                data=json.dumps(article_payload),
+            )
 
-        logger.error(f"payload: {article_payload}")
-        eval_response(response, ReponseCodes.update_successful)
+            if response.status_code == ReponseCodes.update_successful.value:
+                return response
+
+            logger.warning(f"Got error {response.content}. Retrying in {TimeOuts.rate_limit.value} seconds...")
+            time.sleep(TimeOuts.rate_limit.value)
+
+        logger.error(f"Failed updating article '{self.title}' after {retries} retries. Status code: {response.status_code}")
+        sys.exit(1)
 
 
 def eval_response(response: requests.Response, type: ReponseCodes) -> None:
