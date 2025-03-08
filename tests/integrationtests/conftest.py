@@ -63,12 +63,11 @@ def _generated_markdown(tmp_path: Path) -> str:
 @pytest.fixture(scope="function")
 def generated_markdown(tmp_path: Path) -> str:
     """Retruns a randomized Markdown article."""
-    
+
     return _generated_markdown(tmp_path)
 
 @pytest.fixture
 def generated_markdown_list(tmp_path: Path) -> list[str]:
     """Generates multiple unique Markdown files by calling `_generated_markdown` multiple times."""
-    
-    return [_generated_markdown(tmp_path=tmp_path) for _ in range(12)]
 
+    return [_generated_markdown(tmp_path=tmp_path) for _ in range(12)]
