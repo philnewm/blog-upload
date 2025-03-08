@@ -59,7 +59,7 @@
             id: article_id
             run: |
               article_id=$(curl -H "api-key: ${{ secrets.DEVTO_KEY }}" https://dev.to/api/articles/me/unpublished | jq '.[].id' | shuf -n 1)
-              echo "article_id: $article_id" >> $GITHUB_OUTPUT
+              echo "article_id=$article_id" >> $GITHUB_OUTPUT
 
           - name: Create new article
             id: create_article
@@ -105,7 +105,7 @@
               EOF
 
               article_id=$(curl -H "api-key: ${{ secrets.DEVTO_KEY }}" https://dev.to/api/articles/me/unpublished jq --argjson exclude "${{ steps.article_id.outputs.article_id }}" '[.[] | select(.id != ${{ steps.article_id.outputs.article_id }})] | .[].id' | shuf -n 1)
-              echo "update_article_id: $article_id" >> $GITHUB_OUTPUT
+              echo "update_article_id=$article_id" >> $GITHUB_OUTPUT
 
           - name: Apply changes to articles
             uses: philnewm/blog-upload@main
