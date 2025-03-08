@@ -42,7 +42,12 @@ def sync_blog(articles_map: str, local_path: str, source_url: str, api_key: str,
         if not file_path and id:
             logger.info(f"Unpublishing article {file_path}")
 
-            blog_logic.unpublish_existing_blog(api_key=api_key, id=id)
+            title: str = (
+                blog_logic.get_unpublished_title(api_key=api_key, article_id=int(id))
+                if not published
+                else blog_logic.get_published_title(article_id=int(id))
+            )
+            blog_logic.unpublish_blog(api_key=api_key, id=id, title=title)
             continue
 
 if __name__ == "__main__":

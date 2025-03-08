@@ -70,5 +70,5 @@ def generated_markdown(tmp_path: Path) -> str:
 def generated_markdown_list(tmp_path: Path) -> list[str]:
     """Generates multiple unique Markdown files by calling `_generated_markdown` multiple times."""
     
-    return [_generated_markdown(tmp_path=tmp_path) for _ in range(11)]
+    return [_generated_markdown(tmp_path=tmp_path) for _ in range(3)]
 

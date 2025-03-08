@@ -14,7 +14,6 @@
 
     env:
       PYTHON_VERSION: "3.12"
-      DEVTO_API_KEY: ${{ secrets.DEVTO_KEY }}
     
     jobs:
       pytest:
@@ -47,18 +46,66 @@
             run: |
               pytest tests/integrationtests/
             working-directory: ${{ github.workspace }}
+            env:
+              DEVTO_API_KEY: ${{ secrets.DEVTO_KEY }}
 
       smoke-tests:
-        if: false
         needs:
           - pytest
         runs-on: ubuntu-latest
 
         steps:
-          - name: Get markdown files
+          - name: Get random article id
+            id: article_id
             run: |
-              mkdir -p ${{ github.workspace }}/tmp/
-              curl -Z --output-dir "${{ github.workspace }}/tmp/" -O "https://raw.githubusercontent.com/philnewm/blog-upload/refs/heads/main/tests/integrationtests/ansible_molecule_using_vagrant_and_virtualbox.md" -O "https://raw.githubusercontent.com/philnewm/blog-upload/refs/heads/main/tests/integrationtests/ci_in_github_actions.md"
+              article_id=$(curl -H "api-key: ${{ secrets.DEVTO_KEY }}" https://dev.to/api/articles/me/unpublished | jq '.[].id' | shuf -n 1)
+              echo "article_id: $article_id" >> $GITHUB_OUTPUT
+
+          - name: Create new article
+            id: create_article
+            run: |
+              cat > test_create_article.md <<EOF
+              # Smoke test update article
+
+              ## Introduction
+              This is a test markdown file for smoke testing article creations.
+
+              ## Code Example
+              \`\`\`python
+              def hello():
+                  print("Hello, Markdown!")
+              \`\`\`
+
+              ## Quote
+              > "Technology is best when it brings people together."
+
+              ## List of Topics
+              - Bash Scripting
+              - Python Development
+              - DevOps
+              EOF
+
+          - name: Update article
+            id: update_article
+            run: |
+              cat > test_update_article.md <<EOF
+              # Smoke test update article
+
+              ## Introduction
+              This is a test markdown file for smoke testing article updates.
+
+              ## Code Example
+              \`\`\`python
+              def hello():
+                  print("Hello, Updater!")
+              \`\`\`
+
+              ## Quote
+              > "I was updated."
+              EOF
+
+              article_id=$(curl -H "api-key: ${{ secrets.DEVTO_KEY }}" https://dev.to/api/articles/me/unpublished jq --argjson exclude "${{ steps.article_id.outputs.article_id }}" '[.[] | select(.id != ${{ steps.article_id.outputs.article_id }})] | .[].id' | shuf -n 1)
+              echo "update_article_id: $article_id" >> $GITHUB_OUTPUT
 
           - name: Apply changes to articles
             uses: philnewm/blog-upload@main
@@ -70,6 +117,6 @@
               key: ${{ secrets.DEVTO_KEY }}
               publish: False
             env:
-              article_id_map: '{"ansible/molecule_getting_started/ansible_molecule_using_vagrant_and_virtualbox.md": "2179805", "ansible/some_actions/ci_in_github_actions.md": "", "": 2180598}'
+              article_id_map: '{"test_update_article.md": "${{ steps.update_article.outputs.update_article_id }}", "test_create_article.md": "", "": ${{ steps.article_id.outputs.article_id }} }'
 
 ...

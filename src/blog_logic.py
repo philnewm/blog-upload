@@ -17,6 +17,7 @@ class TimeOuts(Enum):
     create = 0.4
     rate_limit = 30
     update = 0.4
+    request = 0.2
 
 
 class BlogArticle():
@@ -149,7 +150,7 @@ def get_published_title(article_id: int) -> str:
         return article["title"]
 
     logger.error(f"Error: {response.status_code}, {response.text}")
-    return ""
+    sys.exit(1)
 
 
 def get_unpublished_title(api_key: str, article_id: int) -> str:
@@ -164,19 +165,13 @@ def get_unpublished_title(api_key: str, article_id: int) -> str:
             return article["title"]
 
         logger.error("Article not found.")
-        return ""
+        sys.exit(1)
 
     logger.error(f"Error: {response.status_code}, {response.text}")
-    return ""
+    sys.exit(1)
 
 
-def unpublish_existing_blog(api_key: str, id: str) -> None:
-        
-        current_title: str = get_unpublished_title(api_key, int(id))
-
-        if not current_title:
-            logger.error("Article not found.")
-            sys.exit(1)
+def unpublish_blog(api_key: str, id: str, title: str, retries: int = 3) -> requests.Response:
 
         headers_dev: dict[str, str] = {
             "Content-Type": "application/json",
@@ -186,14 +181,23 @@ def unpublish_existing_blog(api_key: str, id: str) -> None:
         article_payload = {
             "article": {
                 "published": False,
-                "title": f"[Deleted] - {current_title}",
+                "title": f"[Deleted] - {title}",
             }
         }
 
-        response: requests.Response = requests.put(
-            url=f"https://dev.to/api/articles/{id}",
-            headers=headers_dev,
-            data=json.dumps(article_payload),
-        )
+        for _ in range(retries - 1):
+            time.sleep(TimeOuts.update.value)
+            response: requests.Response = requests.put(
+                url=f"https://dev.to/api/articles/{id}",
+                headers=headers_dev,
+                data=json.dumps(article_payload),
+            )
 
-        eval_response(response, ReponseCodes.update_successful)
+            if response.status_code == ReponseCodes.update_successful.value:
+                return response
+
+            logger.warning(f"Got error {response.content}. Retrying in {TimeOuts.rate_limit.value} seconds...")
+            time.sleep(TimeOuts.rate_limit.value)
+
+        logger.error(f"Failed unpublishin article '{title}' after {retries} retries. Status code: {response.status_code}")
+        sys.exit(1)
