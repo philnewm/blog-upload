@@ -17,7 +17,6 @@
     
     jobs:
       pytest:
-        if: false
         runs-on: ubuntu-latest
     
         steps:
@@ -51,8 +50,8 @@
               DEVTO_API_KEY: ${{ secrets.DEVTO_KEY }}
 
       smoke-tests:
-        # needs:
-        #   - pytest
+        needs:
+          - pytest
         runs-on: ubuntu-latest
 
         steps:
