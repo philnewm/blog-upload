@@ -16,9 +16,9 @@ class ReponseCodes(Enum):
     created_successful = 201
 
 class TimeOuts(Enum):
-    # INFO create and update to 1 prevents timeouts
-    create = 0.7
-    update = 0.7
+    # INFO create and update to 1 second prevents timeouts
+    create = 1
+    update = 1
     rate_limit = 30
     request = 0.2
 
