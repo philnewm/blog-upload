@@ -80,7 +80,7 @@ class BlogArticle():
         }
 
         for _ in range(retries - 1):
-            logger.info(f"Creating article {self.title} after {TimeOuts.create.value} seconds")
+            logger.info(f"Creating article '{self.title}' after {TimeOuts.create.value} seconds")
             time.sleep(TimeOuts.create.value)
             response: requests.Response = requests.post(
                 url='https://dev.to/api/articles',
@@ -118,7 +118,7 @@ class BlogArticle():
         }
 
         for _ in range(retries - 1):
-            logger.info(f"Updating article {self.title} after {TimeOuts.update.value} seconds")
+            logger.info(f"Updating article '{self.title}' after {TimeOuts.update.value} seconds")
             time.sleep(TimeOuts.update.value)
             response: requests.Response = requests.put(
                 url=f"https://dev.to/api/articles/{id}",

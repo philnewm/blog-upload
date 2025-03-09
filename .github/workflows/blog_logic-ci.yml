@@ -43,8 +43,9 @@
             working-directory: ${{ github.workspace }}
 
           - name: Run integration tests
+            # INFO display logs after test run
             run: |
-              pytest tests/integrationtests/ -s
+              pytest tests/integrationtests/ -rP
             working-directory: ${{ github.workspace }}
             env:
               DEVTO_API_KEY: ${{ secrets.DEVTO_KEY }}

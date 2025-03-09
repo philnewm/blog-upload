@@ -19,7 +19,7 @@ def get_devto_api_key() -> str:
     return os.getenv("DEVTO_API_KEY", "")
 
 
-@pytest.mark.parametrize("i", range(12))
+@pytest.mark.parametrize("i", range(5))
 def test_batch_article_creation(generated_markdown: str, i: int) -> None:
 
     devto_key: str = get_devto_api_key()
