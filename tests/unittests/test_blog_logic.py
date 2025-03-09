@@ -19,6 +19,6 @@ def test_BlogArticle_missing_tags(obsidian_markdown_missing_tags: str) -> None:
 def test_BlogArticle_content_only(obsidian_markdown_content_only: str) -> None:
     blog_article: BlogArticle = BlogArticle(obsidian_markdown_content_only, source_url="philnewm-github.io")
     assert blog_article.tags == [""]
-    assert blog_article.title == None
+    assert blog_article.title == ""
     assert blog_article.description == ""
     assert blog_article.content == "## First Header\n\nMain content section.\n"
