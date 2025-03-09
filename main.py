@@ -1,8 +1,9 @@
-import logging
+import click
 import json
+import logging
+
 from pathlib import Path
 from src import blog_logic
-import click
 
 logger = logging.Logger(__file__)
 

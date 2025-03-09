@@ -1,13 +1,15 @@
-from enum import Enum
 import json
 import logging
 import requests
 import sys
-from typing import Optional
-import yaml
 import time
+import yaml
+
+from enum import Enum
+
 
 logger: logging.Logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 class ReponseCodes(Enum):
     update_successful = 200
@@ -24,13 +26,12 @@ class BlogArticle():
     def __init__(self, md_content: str, source_url: str="") -> None:
         self.text: str = md_content
         self.tags: list[str] | None
-        self.title: str | None
         self.article_payload = None
 
         self.tags = self.get_md_property("tags")
         self.description: str = self.get_md_property("description")[0]
         self.canonical_url: str = source_url
-        self.title = self.get_md_title()
+        self.title: str = self.get_md_title()
         self.content: str = self.get_md_body()
 
     def get_md_property(self, property_name: str) -> list[str]:
@@ -41,14 +42,16 @@ class BlogArticle():
 
         return [""]
 
-    def get_md_title(self) -> Optional[str]:
+    def get_md_title(self) -> str:
         self.text = self.text.lstrip("\n")
         if self.text.startswith("# "):
             parts: list[str] = self.text.split("\n", 1)
             self.text = parts[1]
             return parts[0].lstrip("# ")
+        
+        return ""
 
-    def get_md_body(self) -> Optional[str]:
+    def get_md_body(self) -> str:
         self.text = self.text.lstrip("\n")
         if self.text.startswith("## "):
             return self.text.lstrip("\n")
@@ -77,6 +80,7 @@ class BlogArticle():
         }
 
         for _ in range(retries - 1):
+            logger.info(f"Creating article {self.title} after {TimeOuts.create.value} seconds")
             time.sleep(TimeOuts.create.value)
             response: requests.Response = requests.post(
                 url='https://dev.to/api/articles',
@@ -114,6 +118,7 @@ class BlogArticle():
         }
 
         for _ in range(retries - 1):
+            logger.info(f"Updating article {self.title} after {TimeOuts.update.value} seconds")
             time.sleep(TimeOuts.update.value)
             response: requests.Response = requests.put(
                 url=f"https://dev.to/api/articles/{id}",
@@ -131,18 +136,10 @@ class BlogArticle():
         sys.exit(1)
 
 
-def eval_response(response: requests.Response, type: ReponseCodes) -> None:
-    if response.status_code == type.value:
-        logger.info(f"Article {type.name}!")
-        return
-
-    logger.error(f"Failed to {type.name} article. Status code: {response.status_code}")
-    logger.error(f"Response: {response.content}")
-    sys.exit(1)
-
-
 def get_published_title(article_id: int) -> str:
     api_url: str = f"https://dev.to/api/articles/{article_id}"
+    logger.info(f"Requesting published article title from id {article_id} after {TimeOuts.request.value} seconds")
+    time.sleep(TimeOuts.request.value)
     response: requests.Response = requests.get(api_url)
 
     if response.status_code == 200:
@@ -156,6 +153,8 @@ def get_published_title(article_id: int) -> str:
 def get_unpublished_title(api_key: str, article_id: int) -> str:
     api_url = "https://dev.to/api/articles/me/unpublished"
     headers: dict[str, str] = {"api-key": api_key}
+    logger.info(f"Requesting unpublished article title from id {article_id} after {TimeOuts.request.value} seconds")
+    time.sleep(TimeOuts.request.value)
     response: requests.Response = requests.get(api_url, headers=headers)
     if response.status_code == 200:
         articles = response.json()
@@ -186,6 +185,7 @@ def unpublish_blog(api_key: str, id: str, title: str, retries: int = 3) -> reque
         }
 
         for _ in range(retries - 1):
+            logger.info(f"Updating article {title} after {TimeOuts.update.value} seconds")
             time.sleep(TimeOuts.update.value)
             response: requests.Response = requests.put(
                 url=f"https://dev.to/api/articles/{id}",
