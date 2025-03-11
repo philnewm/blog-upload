@@ -24,11 +24,13 @@ def sync_blog(articles_map: str, local_path: str, source_url: str, api_key: str,
     for file_path, id in articles_id_map.items():
         logger.info(f"Checking article {file_path}")
 
+        gh_pages_url: str = f"{source_url}/{file_path.strip('.md')}"
+
         if file_path and id:
             logger.info(f"Updating existing article {file_path}")
 
             local_md_file_path: Path = Path(local_path, Path(file_path).name)
-            blog_article = blog_logic.BlogArticle(local_md_file_path.read_text(), source_url)
+            blog_article = blog_logic.BlogArticle(local_md_file_path.read_text(), gh_pages_url)
             blog_article.update_existing_blog(api_key=api_key, id=id, published=published)
             continue
 
@@ -36,7 +38,7 @@ def sync_blog(articles_map: str, local_path: str, source_url: str, api_key: str,
             logger.info(f"Creating new article {file_path}")
 
             local_md_file_path: Path = Path(local_path, Path(file_path).name)
-            blog_article = blog_logic.BlogArticle(local_md_file_path.read_text(), source_url)
+            blog_article = blog_logic.BlogArticle(local_md_file_path.read_text(), gh_pages_url)
             blog_article.create_new_blog(api_key=api_key, published=published)
             continue
 
