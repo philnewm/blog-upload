@@ -24,7 +24,7 @@ def sync_blog(articles_map: str, local_path: str, source_url: str, api_key: str,
     for file_path, id in articles_id_map.items():
         logger.info(f"Checking article {file_path}")
 
-        gh_pages_url: str = f"{source_url}/{file_path.strip('.md')}"
+        gh_pages_url: str = f"{source_url.rstrip('/')}/{file_path.strip('.md')}"
 
         if file_path and id:
             logger.info(f"Updating existing article {file_path}")
