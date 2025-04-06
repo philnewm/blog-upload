@@ -1,3 +1,35 @@
+front_matter:
+  - slug: "molecule-start"
+    description: "Set up basic CI for Ansible using Molecule"
+    tags:
+      - ansible
+      - molecule
+      - automation
+    authors: [philipp]
+    date:
+      created: "2025-03-20"
+      updated: "2025-03-30"
+  - slug: "ansible-start"
+    description: "Integrate CI with github actions"
+    tags:
+      - ansible
+      - github
+      - automation
+    authors: [philipp]
+    date:
+      created: "2025-03-25"
+      updated: "2025-04-02"
+  - slug: "enhanced-integration"
+    description: "Extend setup with convinience features"
+    tags:
+      - ansible
+      - housekeeping
+      - automation
+    authors: [philipp]
+    date:
+      created: "2025-03-23"
+      updated: "2025-04-02"
+
 titles:
   - "Exploring the Power of Python"
   - "Understanding API Rate Limits"

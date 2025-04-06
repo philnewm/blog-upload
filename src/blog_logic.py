@@ -6,6 +6,7 @@ import time
 import yaml
 
 from enum import Enum
+from pathlib import Path
 
 
 logger: logging.Logger = logging.getLogger(__name__)
@@ -202,3 +203,43 @@ def unpublish_blog(api_key: str, id: str, title: str, retries: int = 3) -> reque
 
         logger.error(f"Failed unpublishin article '{title}' after {retries} retries. Status code: {response.status_code}")
         sys.exit(1)
+
+
+def extract_front_matter(path: Path) -> dict[str, str]:
+    """Get markdown file front-matter ijn yaml format.
+
+    Args:
+        path (Path):path to markdown file
+
+    Returns:
+        dict[str, str]: Extracted dictionary
+    """
+
+    lines: list[str] = path.read_text().splitlines()
+
+    delimiter_indices: list[int] = [i for i, line in enumerate(lines) if line.strip() == "---"]
+
+    if len(delimiter_indices) < 2:
+        return {}
+
+    start: int = 0
+    end: int = 0
+    start, end = delimiter_indices[0], delimiter_indices[1]
+    front_matter_lines: list[str] = lines[start + 1:end]
+    front_matter_text: str = "\n".join(front_matter_lines)
+
+    return yaml.safe_load(front_matter_text) or {}
+
+
+def get_published_articles(api_key: str) -> list[dict[str, str]]:
+    headers: dict[str, str] = {
+        "api-key": api_key
+    }
+
+    response: requests.Response = requests.get("https://dev.to/api/articles/me/published", headers=headers)
+
+    if response.status_code == 200:
+        return response.json()
+
+    logger.error("Failed to fetch articles:", response.status_code)
+    return [{"": ""}]
