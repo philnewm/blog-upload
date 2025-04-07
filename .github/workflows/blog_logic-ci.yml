@@ -95,6 +95,9 @@
             id: update_article
             run: |
               cat > test_update_article.md <<EOF
+              ---
+              slug: test-update
+              ---
               # Smoke test update article
 
               ## Introduction
@@ -111,7 +114,15 @@
               EOF
 
               article_slug=$(curl -H "api-key: ${{ secrets.DEVTO_KEY }}" https://dev.to/api/articles/me/unpublished jq --argjson exclude "${{ steps.article_id.outputs.article_id }}" '[.[] | select(.id != ${{ steps.article_id.outputs.article_id }})] | .[].slug' | shuf -n 1)
-              echo "update_article_id=$article_id" >> $GITHUB_OUTPUT
+              echo "update_article_slug=$article_slug" >> $GITHUB_OUTPUT
+
+          - name: Show current files
+            shell: bash
+            run: |
+              cd $GITHUB_ACTION_PATH
+              echo "Current working directory: $(pwd)"
+              echo "Files:"
+              ls -R
 
           - name: Apply changes to articles
             uses: philnewm/blog-upload@main
@@ -123,6 +134,6 @@
               key: ${{ secrets.DEVTO_KEY }}
               publish: False
             env:
-              article_id_map: "{\"added\": [\"test_create_article.md\"], \"updated\": [\"${{ steps.update_article.outputs.update_article_id }}\"], \"removed\": [\"test_update_article.md\"]}"
+              article_id_map: "{\"added\": [\"test_create_article.md\"], \"updated\": [\"test_update_article.md\"], \"removed\": [\"test_update_article.md\"]}"
 
 ...

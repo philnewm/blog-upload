@@ -25,7 +25,7 @@ def sync_blog(articles_map: str, local_path: str, source_url: str, api_key: str,
     updated_paths: list[str] = articles_id_map["updated"]
     removed_paths: list[str] = articles_id_map["removed"]
 
-    if added_paths:
+    if added_paths and added_paths[0]:
         for file_path in added_paths:
             logger.info(f"Creating new article {file_path}")
 
@@ -39,7 +39,7 @@ def sync_blog(articles_map: str, local_path: str, source_url: str, api_key: str,
             blog_article = blog_logic.BlogArticle(local_md_file_path.read_text(), gh_pages_url)
             blog_article.create_new_blog(api_key=api_key, published=published)
 
-    if updated_paths:
+    if updated_paths and updated_paths[0]:
         for file_path in updated_paths:
             logger.info(f"Updating existing article {file_path}")
 
@@ -57,7 +57,7 @@ def sync_blog(articles_map: str, local_path: str, source_url: str, api_key: str,
             blog_article = blog_logic.BlogArticle(local_md_file_path.read_text(), gh_pages_url)
             blog_article.update_existing_blog(api_key=api_key, id=id, published=published)
 
-    if removed_paths:
+    if removed_paths and removed_paths[0]:
         for file_path in removed_paths:
             logger.info(f"Unpublishing article {file_path}")
 
