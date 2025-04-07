@@ -50,6 +50,6 @@ runs:
       shell: bash
       run: |
         cd $GITHUB_ACTION_PATH
-        python main.py sync-blog '${{ inputs.articles_map }}' "${{ inputs.markdown_files_dir }}" "${{ inputs.gh_pages_repo }}" "${{ inputs.key }}" ${{ inputs.publish == "true" }}
+        python main.py sync-blog '${{ inputs.articles_map }}' "${{ inputs.markdown_files_dir }}" "${{ inputs.gh_pages_repo }}" "${{ inputs.key }}" "${{ inputs.publish }}"
 
 ...

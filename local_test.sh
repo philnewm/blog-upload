@@ -2,7 +2,7 @@ articles_map='{"added": ["test_create_article.md"], "updated": ["test_update_art
 markdown_files_dir="tmp/"
 gh_pages_repo="https://philnewm.github.io/"
 key=""
-publish=false
+publish="false"
 
 cat > tmp/test_create_article.md <<EOF
 ---
