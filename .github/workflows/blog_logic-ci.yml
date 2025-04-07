@@ -70,7 +70,7 @@
             run: |
               cat > test_create_article.md <<EOF
               ---
-              slug: test-creation
+              slug: test-update
               ---
               # Smoke test create article
 
