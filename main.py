@@ -49,10 +49,9 @@ def sync_blog(articles_map: str, local_path: str, source_url: str, api_key: str,
             if slug:
                 gh_pages_url = f"{source_url.rstrip('/')}/{slug}"
 
-            published_blogs: list[dict[str, str]] = blog_logic.get_published_articles(api_key=api_key)
+            published_blogs: list[dict[str, str]] = blog_logic.get_articles(api_key=api_key, published=published)
             id: str = [published_blog["id"] for published_blog in published_blogs if published_blog["canonical_url"] == gh_pages_url][0]
 
-            gh_pages_url: str = f"{source_url.rstrip('/')}/{file_path.strip('.md')}"
             local_md_file_path: Path = Path(local_path, Path(file_path).name)
             blog_article = blog_logic.BlogArticle(local_md_file_path.read_text(), gh_pages_url)
             blog_article.update_existing_blog(api_key=api_key, id=id, published=published)
@@ -67,7 +66,7 @@ def sync_blog(articles_map: str, local_path: str, source_url: str, api_key: str,
             if slug:
                 gh_pages_url = f"{source_url.rstrip('/')}/{slug}"
 
-            published_blogs: list[dict[str, str]] = blog_logic.get_published_articles(api_key=api_key)
+            published_blogs: list[dict[str, str]] = blog_logic.get_articles(api_key=api_key, published=published)
             id: str = [published_blog["id"] for published_blog in published_blogs if published_blog["canonical_url"] == gh_pages_url][0]
 
             title: str = (

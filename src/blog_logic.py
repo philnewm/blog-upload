@@ -231,12 +231,13 @@ def extract_front_matter(path: Path) -> dict[str, str]:
     return yaml.safe_load(front_matter_text) or {}
 
 
-def get_published_articles(api_key: str) -> list[dict[str, str]]:
+def get_articles(api_key: str, published: bool = True) -> list[dict[str, str]]:
     headers: dict[str, str] = {
         "api-key": api_key
     }
+    api_enpoint: str = ["unpublished", "published"][published]
 
-    response: requests.Response = requests.get("https://dev.to/api/articles/me/published", headers=headers)
+    response: requests.Response = requests.get(f"https://dev.to/api/articles/me/{api_enpoint}", headers=headers)
 
     if response.status_code == 200:
         return response.json()
