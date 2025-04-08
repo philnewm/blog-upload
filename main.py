@@ -31,6 +31,7 @@ def sync_blog(articles_map: str, local_path: str, source_url: str, api_key: str,
         for file_path in added_paths:
             logger.info(f"Creating new article {file_path}")
 
+            file_path: str = Path(file_path).name
             gh_pages_url: str = f"{source_url.rstrip('/')}/{file_path.strip('.md')}"
             slug: str = blog_logic.extract_front_matter(Path(local_path, file_path)).get("slug", "")
 
@@ -45,6 +46,7 @@ def sync_blog(articles_map: str, local_path: str, source_url: str, api_key: str,
         for file_path in updated_paths:
             logger.info(f"Updating existing article {file_path}")
 
+            file_path: str = Path(file_path).name
             gh_pages_url: str = f"{source_url.rstrip('/')}/{file_path.strip('.md')}"
             slug: str = blog_logic.extract_front_matter(Path(local_path, file_path)).get("slug", "")
 
@@ -62,6 +64,7 @@ def sync_blog(articles_map: str, local_path: str, source_url: str, api_key: str,
         for file_path in removed_paths:
             logger.info(f"Unpublishing article {file_path}")
 
+            file_path: str = Path(file_path).name
             gh_pages_url: str = f"{source_url.rstrip('/')}/{file_path.strip('.md')}"
             slug: str = blog_logic.extract_front_matter(Path(local_path, file_path)).get("slug", "")
 
